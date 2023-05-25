@@ -32,9 +32,7 @@ void setup() {
 
   Serial.println("INFO: conectado a rede WiFi no canal " + String(WiFi.channel()));
 
-  int channel = WiFi.channel() != 1 ? 1 : 11;
-
-  WiFi.softAP("Esp32", "", channel, 1, 4);
+  esp_wifi_set_ps(WIFI_PS_NONE);
 
   if (esp_now_init() != ESP_OK) {
     Serial.println("ERRO: erro ao inicializar ESP-NOW");
@@ -48,7 +46,7 @@ void setup() {
   memcpy(broadcastPeerInfo.peer_addr, broadcastMac, 6);
   broadcastPeerInfo.channel = WiFi.channel();
   broadcastPeerInfo.encrypt = false;
-  broadcastPeerInfo.ifidx = WIFI_IF_AP;
+  broadcastPeerInfo.ifidx = WIFI_IF_STA;
 }
 
 void loop() {
@@ -94,7 +92,7 @@ void onDataReceived(const uint8_t *macAddr, const uint8_t *data, int len) {
     memcpy(peerInfo.peer_addr, macAddr, 6);
     memcpy(peerMac, macAddr, 6);
     peerInfo.channel = WiFi.channel();
-    peerInfo.ifidx = WIFI_IF_AP;
+    peerInfo.ifidx = WIFI_IF_STA;
     if (esp_now_is_peer_exist(macAddr)) {
       esp_now_del_peer(macAddr);
     }
